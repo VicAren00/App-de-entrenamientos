@@ -1,15 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, useColorScheme } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import { mockWorkouts } from '@/data/mockData';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { loadWorkouts, Workout } from '@/utils/storage';
 
 export default function HistoryScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
 
-  const renderItem = ({ item }: { item: typeof mockWorkouts[0] }) => (
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      const data = await loadWorkouts();
+      setWorkouts(data);
+    };
+    fetchWorkouts();
+  }, []);
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const timeString = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+    if (diffDays === 0) return `Hoy, ${timeString}`;
+    if (diffDays === 1) return `Ayer, ${timeString}`;
+    if (diffDays < 7) return `Hace ${diffDays} días, ${timeString}`;
+    return date.toLocaleDateString('es-ES') + ', ' + timeString;
+  };
+
+  const formatDuration = (seconds: number) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    if (hrs > 0) return `${hrs}h ${mins}m`;
+    return `${mins}m`;
+  };
+
+  const calculateVolume = (workout: Workout) => {
+    let total = 0;
+    workout.exercises.forEach(ex => {
+      ex.sets.forEach(set => {
+        if (set.completed) {
+          const weight = parseFloat(set.weight) || 0;
+          const reps = parseInt(set.reps) || 0;
+          total += weight * reps;
+        }
+      });
+    });
+    return total.toLocaleString() + ' kg';
+  };
+
+  const renderItem = ({ item }: { item: Workout }) => (
     <TouchableOpacity 
       style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}
       onPress={() => router.push(`/history-detail?id=${item.id}`)}
@@ -21,16 +65,16 @@ export default function HistoryScreen() {
       <View style={styles.statsRow}>
         <View style={styles.stat}>
           <Ionicons name="calendar-outline" size={16} color={theme.cardSecondaryText} />
-          <Text style={[styles.statText, { color: theme.cardSecondaryText }]}>{item.date}</Text>
+          <Text style={[styles.statText, { color: theme.cardSecondaryText }]}>{formatDate(item.date)}</Text>
         </View>
         <View style={styles.stat}>
           <Ionicons name="time-outline" size={16} color={theme.cardSecondaryText} />
-          <Text style={[styles.statText, { color: theme.cardSecondaryText }]}>{item.duration}</Text>
+          <Text style={[styles.statText, { color: theme.cardSecondaryText }]}>{formatDuration(item.duration)}</Text>
         </View>
       </View>
       <View style={styles.statsRow}>
-        <Text style={[styles.statSubText, { color: theme.cardSecondaryText }]}>{item.exercises} ejercicios</Text>
-        <Text style={[styles.statSubText, { color: theme.cardSecondaryText }]}>Vol: {item.volume}</Text>
+        <Text style={[styles.statSubText, { color: theme.cardSecondaryText }]}>{item.exercises.length} ejercicios</Text>
+        <Text style={[styles.statSubText, { color: theme.cardSecondaryText }]}>Vol: {calculateVolume(item)}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -38,7 +82,7 @@ export default function HistoryScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <FlatList
-        data={mockWorkouts}
+        data={workouts}
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}

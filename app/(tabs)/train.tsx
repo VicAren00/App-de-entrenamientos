@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, useColorScheme, Alert } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import { saveWorkout } from '@/utils/storage';
 
 interface Set {
   id: string;
@@ -99,8 +100,16 @@ export default function TrainScreen() {
     }));
   };
 
-  const finishTraining = () => {
+  const finishTraining = async () => {
     setIsTraining(false);
+    const workout = {
+      id: Date.now().toString(),
+      title: 'Entrenamiento Libre',
+      date: new Date().toISOString(),
+      duration: timer,
+      exercises: exercises,
+    };
+    await saveWorkout(workout);
     Alert.alert('¡Excelente!', 'Entrenamiento finalizado y guardado.');
   };
 

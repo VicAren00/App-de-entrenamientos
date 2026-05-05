@@ -1,40 +1,83 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, useColorScheme, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import { mockWorkouts, mockTrainSession } from '@/data/mockData';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { loadWorkouts, Workout } from '@/utils/storage';
 
 export default function HistoryDetailScreen() {
   const { id } = useLocalSearchParams();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
   
-  const workout = mockWorkouts.find(w => w.id === id) || mockWorkouts[0];
+  const [workout, setWorkout] = useState<Workout | null>(null);
+
+  useEffect(() => {
+    const fetchWorkout = async () => {
+      const workouts = await loadWorkouts();
+      const found = workouts.find(w => w.id === id);
+      setWorkout(found || null);
+    };
+    fetchWorkout();
+  }, [id]);
+
+  if (!workout) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: theme.text }}>Cargando...</Text>
+      </View>
+    );
+  }
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ', ' + date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatDuration = (seconds: number) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    if (hrs > 0) return `${hrs}h ${mins}m`;
+    return `${mins}m`;
+  };
+
+  const calculateVolume = (workout: Workout) => {
+    let total = 0;
+    workout.exercises.forEach(ex => {
+      ex.sets.forEach(set => {
+        if (set.completed) {
+          const weight = parseFloat(set.weight) || 0;
+          const reps = parseInt(set.reps) || 0;
+          total += weight * reps;
+        }
+      });
+    });
+    return total.toLocaleString() + ' kg';
+  };
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: theme.text }]}>{workout.title}</Text>
-        <Text style={[styles.date, { color: theme.cardSecondaryText }]}>{workout.date}</Text>
+        <Text style={[styles.date, { color: theme.cardSecondaryText }]}>{formatDate(workout.date)}</Text>
       </View>
 
       <View style={styles.statsContainer}>
         <View style={[styles.statBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <Ionicons name="time-outline" size={24} color={theme.tint} />
-          <Text style={[styles.statValue, { color: theme.text }]}>{workout.duration}</Text>
+          <Text style={[styles.statValue, { color: theme.text }]}>{formatDuration(workout.duration)}</Text>
           <Text style={[styles.statLabel, { color: theme.cardSecondaryText }]}>Tiempo</Text>
         </View>
         <View style={[styles.statBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <Ionicons name="barbell-outline" size={24} color={theme.tint} />
-          <Text style={[styles.statValue, { color: theme.text }]}>{workout.volume}</Text>
+          <Text style={[styles.statValue, { color: theme.text }]}>{calculateVolume(workout)}</Text>
           <Text style={[styles.statLabel, { color: theme.cardSecondaryText }]}>Volumen</Text>
         </View>
       </View>
 
       <Text style={[styles.sectionTitle, { color: theme.text }]}>Ejercicios Realizados</Text>
       
-      {mockTrainSession.exercises.map((exercise, index) => (
+      {workout.exercises.map((exercise, index) => (
         <View key={exercise.id} style={[styles.exerciseCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <Text style={[styles.exerciseName, { color: theme.text }]}>{index + 1}. {exercise.name}</Text>
           
