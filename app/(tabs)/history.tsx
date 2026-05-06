@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, useColorScheme } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { loadWorkouts, Workout } from '@/utils/storage';
 
 export default function HistoryScreen() {
@@ -11,13 +11,16 @@ export default function HistoryScreen() {
 
   const [workouts, setWorkouts] = useState<Workout[]>([]);
 
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      const data = await loadWorkouts();
-      setWorkouts(data);
-    };
-    fetchWorkouts();
-  }, []);
+  const fetchWorkouts = async () => {
+    const data = await loadWorkouts();
+    setWorkouts(data);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchWorkouts();
+    }, [])
+  );
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
@@ -81,13 +84,27 @@ export default function HistoryScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <FlatList
-        data={workouts}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-      />
+      <View style={[styles.header, { borderBottomColor: theme.border }]}>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Historial de Entrenamientos</Text>
+      </View>
+
+      {workouts.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Ionicons name="history-outline" size={48} color={theme.icon} />
+          <Text style={[styles.emptyStateText, { color: theme.text }]}>Sin entrenamientos</Text>
+          <Text style={[styles.emptyStateSubtext, { color: theme.cardSecondaryText }]}>
+            Completa tu primer entrenamiento para ver tu historial aquí
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={workouts}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 }
@@ -96,8 +113,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
   listContainer: {
     padding: 16,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    textAlign: 'center',
   },
   card: {
     padding: 16,

@@ -58,6 +58,85 @@ export const mockTrainSession = {
   ]
 };
 
+export const workoutTemplates = [
+  {
+    id: "push",
+    name: "Push - Pecho, Hombros, Tríceps",
+    description: "Enfocado en movimientos de empuje. Ideal para desarrollar pecho, hombros y tríceps.",
+    icon: "arrow-forward",
+    exercises: [
+      { name: "Press de Banca Plano", sets: 4, reps: 8, weight: 80 },
+      { name: "Press de Banca Inclinado", sets: 3, reps: 10, weight: 70 },
+      { name: "Press Militar (Hombros)", sets: 4, reps: 8, weight: 40 },
+      { name: "Aperturas con Mancuernas", sets: 3, reps: 12, weight: 20 },
+      { name: "Elevaciones Laterales", sets: 3, reps: 12, weight: 12 },
+      { name: "Extensiones de Tríceps en Polea", sets: 3, reps: 12, weight: 25 },
+      { name: "Fondos en Banco (Tríceps)", sets: 3, reps: 10, weight: 0 },
+    ]
+  },
+  {
+    id: "pull",
+    name: "Pull - Espalda y Bíceps",
+    description: "Enfocado en movimientos de tracción. Fortalece espalda, bíceps y antebrazos.",
+    icon: "arrow-back",
+    exercises: [
+      { name: "Dominadas", sets: 4, reps: 8, weight: 0 },
+      { name: "Remo con Barra", sets: 4, reps: 8, weight: 70 },
+      { name: "Remo con Mancuerna", sets: 3, reps: 10, weight: 30 },
+      { name: "Jalones Laterales", sets: 3, reps: 12, weight: 70 },
+      { name: "Curl de Bíceps con Barra", sets: 3, reps: 10, weight: 20 },
+      { name: "Curl de Bíceps con Mancuernas", sets: 3, reps: 12, weight: 15 },
+      { name: "Face Pulls (Posterior de Hombros)", sets: 3, reps: 15, weight: 30 },
+    ]
+  },
+  {
+    id: "legs",
+    name: "Piernas - Tren Inferior",
+    description: "Entrenamiento completo de piernas. Trabaja cuádriceps, isquios, glúteos y pantorrillas.",
+    icon: "accessibility",
+    exercises: [
+      { name: "Sentadillas con Barra", sets: 4, reps: 8, weight: 100 },
+      { name: "Prensa de Piernas", sets: 3, reps: 10, weight: 200 },
+      { name: "Estocadas con Mancuernas", sets: 3, reps: 10, weight: 25 },
+      { name: "Extensiones de Cuádriceps", sets: 3, reps: 12, weight: 100 },
+      { name: "Curl de Femorales", sets: 3, reps: 12, weight: 80 },
+      { name: "Elevaciones de Pantorrilla", sets: 4, reps: 15, weight: 100 },
+      { name: "Sentadillas Sumo", sets: 3, reps: 10, weight: 80 },
+    ]
+  },
+  {
+    id: "torso",
+    name: "Torso - Pecho, Espalda, Hombros",
+    description: "Rutina integral del torso. Combina push y pull para desarrollo equilibrado.",
+    icon: "body",
+    exercises: [
+      { name: "Press de Banca", sets: 3, reps: 8, weight: 80 },
+      { name: "Remo con Barra", sets: 3, reps: 8, weight: 70 },
+      { name: "Press Militar", sets: 3, reps: 10, weight: 40 },
+      { name: "Jalones Laterales", sets: 3, reps: 12, weight: 70 },
+      { name: "Aperturas con Mancuernas", sets: 3, reps: 12, weight: 20 },
+      { name: "Curl de Bíceps", sets: 2, reps: 10, weight: 15 },
+      { name: "Extensiones de Tríceps", sets: 2, reps: 10, weight: 25 },
+    ]
+  },
+  {
+    id: "fullbody",
+    name: "Full Body - Cuerpo Completo",
+    description: "Entrenamiento completo en una sesión. Ideal para 3 días por semana.",
+    icon: "fitness",
+    exercises: [
+      { name: "Sentadillas con Barra", sets: 3, reps: 8, weight: 100 },
+      { name: "Press de Banca", sets: 3, reps: 8, weight: 80 },
+      { name: "Remo con Barra", sets: 3, reps: 8, weight: 70 },
+      { name: "Press Militar", sets: 2, reps: 10, weight: 40 },
+      { name: "Extensiones de Cuádriceps", sets: 2, reps: 12, weight: 100 },
+      { name: "Curl de Bíceps", sets: 2, reps: 10, weight: 15 },
+      { name: "Extensiones de Tríceps", sets: 2, reps: 10, weight: 25 },
+      { name: "Planchas Abdominales", sets: 3, reps: "60s", weight: 0 },
+    ]
+  },
+];
+
 export const mockExercisesLibrary = [
   // PECHO
   {
